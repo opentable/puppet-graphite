@@ -323,7 +323,7 @@ class graphite (
       method => 'average'
     }
   },
-  $gr_web_server                = 'apache',
+  $gr_web_server                = 'nginx',
   $gr_web_servername            = $::fqdn,
   $gr_web_cors_allow_from_all   = false,
   $gr_apache_port               = 80,
