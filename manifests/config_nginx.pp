@@ -39,6 +39,10 @@ class graphite::config_nginx inherits graphite::params {
       require    => Exec['Chown graphite for web user'];
   }
 
+  service { $::graphite::params::apache_service_name:
+    ensure     => stopped
+  }
+
   # Ensure that some directories exist first. This is normally handled by the
   # package, but if we uninstall and reinstall nginx and delete /etc/nginx.
   # By default the package manager won't replace the directory.

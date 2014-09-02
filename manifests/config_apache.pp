@@ -64,6 +64,10 @@ class graphite::config_apache inherits graphite::params {
     require    => Exec['Chown graphite for web user'];
   }
 
+  service { 'nginx':
+    ensure => stopped
+  }
+
   # Deploy configfiles
   file {
     "${::graphite::params::apache_dir}/ports.conf":
