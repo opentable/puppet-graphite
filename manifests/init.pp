@@ -225,15 +225,14 @@
 #   Default is 'False'.
 # [*gr_memcache_hosts*]
 #   Array of memcache hosts. e.g.: ['127.0.0.1:11211', '10.10.10.1:11211']
-#   Defalut is undef
+#   Defalut is undef.
 # [*secret_key*]
 #   Secret used as salt for things like hashes, cookies, sessions etc.
 #   Has to be the same on all nodes of a graphite cluster.
 #   Default is UNSAFE_DEFAULT (CHANGE IT!)
-# [*gr_cluster_enable*]
-#   en/dis-able cluster configuration.   Default: false
 # [*gr_cluster_servers*]
-#   list of IP:port tuples for the servers in the cluster.  Default: "[]"
+#   Array of webbapp hosts. eg.: ['10.0.2.2:80', '10.0.2.3:80']
+#   Default is undef.
 # [*gr_cluster_fetch_timeout*]
 #    Timeout to fetch series data.   Default = 6
 # [*gr_cluster_find_timeout*]
@@ -247,6 +246,9 @@
 #   If set, Nginx will be configured to use HTTP Basic authentication with the
 #   given user & password.
 #   Default is undefined
+# [*nginx_proxy_read_timeout*]
+#   Value to use for nginx's proxy_read_timeout setting
+#   Default is 10s
 # [*manage_ca_certificate*]
 #   Used to determine to install ca-certificate or not. default = true
 # [*gr_use_ldap*]
@@ -269,6 +271,9 @@
 #   variable (mainly for nginx use) to tell Graphite a user is authenticated.
 #   Useful when using an external auth handler with X-Accel-Redirect etc.
 #   Example value - HTTP_X_REMOTE_USER
+# [*gunicorn_arg_timeout*]
+#   value to pass to gunicorns --timeout arg.
+#   Default is 30
 
 # === Examples
 #
@@ -392,13 +397,13 @@ class graphite (
   $gr_amqp_metric_name_in_body  = 'False',
   $gr_memcache_hosts            = undef,
   $secret_key                   = 'UNSAFE_DEFAULT',
-  $gr_cluster_enable            = false,
-  $gr_cluster_servers           = '[]',
+  $gr_cluster_servers           = undef,
   $gr_cluster_fetch_timeout     = 6,
   $gr_cluster_find_timeout      = 2.5,
   $gr_cluster_retry_delay       = 60,
   $gr_cluster_cache_duration    = 300,
   $nginx_htpasswd               = undef,
+  $nginx_proxy_read_timeout     = 10,
   $manage_ca_certificate        = true,
   $gr_use_ldap                  = false,
   $gr_ldap_uri                  = '',
@@ -408,7 +413,8 @@ class graphite (
   $gr_ldap_user_query           = '(username=%s)',
   $gr_use_remote_user_auth      = 'False',
   $gr_remote_user_header_name   = undef,
-  $gr_local_data_dir            = '/opt/graphite/storage/whisper'
+  $gr_local_data_dir            = '/opt/graphite/storage/whisper',
+  $gunicorn_arg_timeout         = 30
 ) {
   # Validation of input variables.
   # TODO - validate all the things
