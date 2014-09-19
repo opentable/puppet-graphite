@@ -8,6 +8,7 @@
     * [Beginning with graphite - Installation](#beginning-with-graphite)
     * [Configure MySQL and Memcached](#configure-mysql-and-memcached)
     * [Configuration with Apache 2.4 and CORS](#configuration-with-apache-24-and-cors)
+    * [Configuration with Additional LDAP Options](#configuration-with-additional-ldap-options)
 4. [Usage - The class and available configurations](#usage)
 7. [Requirements](#requirements)
 5. [Limitations - OS compatibility, etc.](#limitations)
@@ -86,6 +87,36 @@ If you do not know what CORS, then do not use it. Its disabled by default. You w
   }
 ```
 
+###Configuration with Additional LDAP Options
+
+If additional LDAP parameters are needed for your Graphite installation, you can specify them using the `gr_ldap_options`
+parameter. For example, this is useful if you're using SSL and need to configure LDAP to use your SSL cert and key files.
+
+This Puppet configuration...
+
+```puppet
+  class { 'graphite':
+    gr_ldap_options => {
+      'ldap.OPT_X_TLS_REQUIRE_CERT' => 'ldap.OPT_X_TLS_ALLOW',
+      'ldap.OPT_X_TLS_CACERTDIR'    => '"/etc/ssl/ca"',
+      'ldap.OPT_X_TLS_CERTFILE'     => '"/etc/ssl/mycert.crt"',
+      'ldap.OPT_X_TLS_KEYFILE'      => '"/etc/ssl/mykey.pem"',
+    },
+  }
+```
+
+... adds these lines to the local_settings.py configuration file for Graphite web.
+
+```python
+import ldap
+ldap.set_option(ldap.OPT_X_TLS_CACERTDIR, "/etc/ssl/ca")
+ldap.set_option(ldap.OPT_X_TLS_CERTFILE, "/etc/ssl/mycert.crt")
+ldap.set_option(ldap.OPT_X_TLS_KEYFILE, "/etc/ssl/mykey.pem")
+ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+```
+
+See http://www.python-ldap.org/ for more details about these options.
+
 ##Usage
 
 ####Class: `graphite`
@@ -113,6 +144,10 @@ Default is 500. Limits the number of whisper update_many() calls per second, whi
 #####`gr_max_creates_per_minute`
 
 Default is 50. Softly limits the number of whisper files that get created each minute.
+
+#####`gr_carbon_metric_prefix`
+
+The prefix to be applied to internal performance metrics. Defaults to 'carbon'.
 
 #####`gr_carbon_metric_interval`
 
@@ -153,6 +188,14 @@ Default is 'False' (string). Set this to 'True' to revert to the old-fashioned i
 #####`gr_use_whitelist`
 
 Default is 'False' (string). Set this to 'True' to enable whitelists and blacklists.
+
+#####`gr_whitelist`
+
+List of patterns to be included in whitelist.conf. Default is [ '.*' ].
+
+#####`gr_blacklist`
+
+List of patterns to be included in blacklist.conf. Default is [ ].
 
 #####`gr_cache_query_interface`
 
@@ -215,6 +258,22 @@ Default is `$::fqdn` (string). Virtualhostname of Graphite webgui.
 Default is false (boolean). Include CORS Headers for all hosts (*) in web server config.
 This is needed for tools like Grafana.
 
+#####`gr_use_ssl`
+
+If true, alter web server config to enable SSL. Default is false (boolean).
+
+#####`gr_ssl_cert`
+
+Path to SSL cert file. Default is undef.
+
+#####`gr_ssl_key`
+
+Path to SSL key file. Default is undef.
+
+#####`gr_ssl_dir`
+
+Path to SSL dir containing keys and certs. Default is undef.
+
 #####`gr_web_group`
 
 Default is undef. Group name to chgrp the files that will served by webserver.  Use only with gr_web_server => 'wsgionly' or 'none'.
@@ -229,6 +288,10 @@ Default is 80. The HTTP port apache will use.
 #####`gr_apache_port_https`
 
 Default is 443. The HTTPS port apache will use.
+
+#####`gr_apache_conf_template`
+
+Template to use for Apache vhost config. Default is 'graphite/etc/apache2/sites-available/graphite.conf.erb'.
 
 #####`gr_apache_24`
 
@@ -267,6 +330,59 @@ Default is '' (string). Hostname/IP of database server.
 #####`gr_django_db_port`
 
 Default is '' (string). Port of database.
+
+#####`gr_enable_carbon_relay`
+
+Default is false. Enable carbon relay.
+
+#####`gr_relay_line_interface`
+
+Default is '0.0.0.0' (string)
+
+#####`gr_relay_line_port`
+
+Default is 2013 (integer)
+
+#####`gr_relay_pickle_interface`
+
+Default is '0.0.0.0' (string)
+
+#####`gr_relay_pickle_port`
+
+Default is 2014 (integer)
+
+#####`gr_relay_method`
+
+Default is 'rules'
+
+#####`gr_relay_replication_factor`
+
+Default is 1 (integer). Add redundancy by replicating every datapoint to more than one machine.
+
+#####`gr_relay_destinations`
+
+Default  is [ '127.0.0.1:2004' ] (array). Array of backend carbons for relay.
+
+#####`gr_relay_max_queue_size`
+
+Default is 10000 (integer)
+
+#####`gr_relay_use_flow_control`
+
+Default is 'True' (string).
+
+#####`gr_relay_rules`
+
+Relay rule set.
+Default is
+```
+{
+   all       => { pattern      => '.*',
+                  destinations => [ '127.0.0.1:2004' ] },
+   'default' => { 'default'    => true,
+                  destinations => [ '127.0.0.1:2004:a' ] },
+}
+```
 
 #####`gr_enable_carbon_aggregator`
 
@@ -383,6 +499,10 @@ Default is '' (string). Set ldap password.
 
 Default is '(username=%s)' (string). Set ldap user query.
 
+#####`gr_ldap_options`
+
+Hash of additional LDAP options to be enabled. For example, `{ 'ldap.OPT_X_TLS_REQUIRE_CERT' => 'ldap.OPT_X_TLS_ALLOW' }`. Default is `{ }`.
+
 #####`gr_use_remote_user_auth`
 
 Default is 'False' (string). Allow use of REMOTE_USER env variable within Django/Graphite.
@@ -400,6 +520,10 @@ The sample external auth app is available from [here](https://github.com/antoine
 #####`gunicorn_arg_timeout`
 
 Default is 30.  value to pass to gunicorns --timeout arg.
+
+#####`gunicorn_workers`
+  
+Default is 2. value to pass to gunicorn's --worker arg.
 
 ##Requirements
 
