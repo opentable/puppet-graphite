@@ -32,6 +32,8 @@ class graphite::install::carbon (
         ensure => directory,
         mode   => '0755',
       })
+      
+      ensure_resource('package', 'git', { ensure => installed })
 
       vcsrepo { '/var/git/carbon':
         ensure   => present,
