@@ -6,10 +6,19 @@
 #
 # None.
 #
-class graphite::install(
-  $django_tagging_ver = '0.3.1',
-  $twisted_ver        = '11.1.0',
-  $txamqp_ver         = '0.4',
+class graphite::install (
+  $django_tagging_ver        = '0.3.1',
+  $twisted_ver               = '11.1.0',
+  $txamqp_ver                = '0.4',
+  $gw_installation_type      = 'package',
+  $gw_ver                    = '0.9.12',
+  $gw_source                 = undef,
+  $carbon_installation_type  = 'package',
+  $carbon_ver                = '0.9.12',
+  $carbon_source             = undef,
+  $whisper_installation_type = 'package',
+  $whisper_ver               = '0.9.12',
+  $whisper_source            = undef,
 ) inherits graphite::params {
 
   if $caller_module_name != $module_name {
@@ -26,7 +35,7 @@ class graphite::install(
   # optinal: python-ldap, python-memcache, memcached, python-sqlite
 
   # using the pip package provider requires python-pip
-  
+
   if ! defined(Package[$::graphite::params::python_pip_pkg]) {
     package { $::graphite::params::python_pip_pkg :
       provider => undef, # default to package provider auto-discovery
@@ -39,7 +48,7 @@ class graphite::install(
   }
 
   # install python headers and libs for pip
-  
+
   if ! defined(Package[$::graphite::params::python_dev_pkg]) {
     package { $::graphite::params::python_dev_pkg :
       provider => undef, # default to package provider auto-discovery
@@ -66,25 +75,7 @@ class graphite::install(
     name     => 'txAMQP',
     ensure   => $txamqp_ver,
   }->
-  package{'graphite-web':
-    ensure   => $::graphite::params::graphiteVersion,
-  }->
-  package{'carbon':
-    ensure   => $::graphite::params::carbonVersion,
-  }->
-  package{'whisper':
-    ensure   => $::graphite::params::whisperVersion,
-  }->
-
-  # workaround for unusual graphite install target:
-  # https://github.com/graphite-project/carbon/issues/86
-  file { $::graphite::params::carbin_pip_hack_source :
-    ensure => link,
-    target => $::graphite::params::carbin_pip_hack_target,
-  }->
-  file { $::graphite::params::gweb_pip_hack_source :
-    ensure => link,
-    target => $::graphite::params::gweb_pip_hack_target,
-  }
-
+  class { 'graphite::install::graphite_web': } ->
+  class { 'graphite::install::carbon': } ->
+  class { 'graphite::install::whisper': }
 }

@@ -11,18 +11,18 @@ class graphite::params {
   $build_dir = '/usr/local/src/'
 
   $python_pip_pkg = 'python-pip'
-  $graphiteVersion = '0.9.12'
-  $carbonVersion   = '0.9.12'
-  $whisperVersion  = '0.9.12'
+  # $graphiteVersion = '0.9.12'
+  # $carbonVersion   = '0.9.12'
+  # $whisperVersion  = '0.9.12'
 
-  $whisper_dl_url = "http://github.com/graphite-project/whisper/archive/${::graphite::params::whisperVersion}.tar.gz"
-  $whisper_dl_loc = "${build_dir}/whisper-${::graphite::params::whisperVersion}"
+  # $whisper_dl_url = "http://github.com/graphite-project/whisper/archive/${::graphite::params::whisperVersion}.tar.gz"
+  # $whisper_dl_loc = "${build_dir}/whisper-${::graphite::params::whisperVersion}"
+  #
+  # $webapp_dl_url = "http://github.com/graphite-project/graphite-web/archive/${::graphite::params::graphiteVersion}.tar.gz"
+  # $webapp_dl_loc = "${build_dir}/graphite-web-${::graphite::params::graphiteVersion}"
 
-  $webapp_dl_url = "http://github.com/graphite-project/graphite-web/archive/${::graphite::params::graphiteVersion}.tar.gz"
-  $webapp_dl_loc = "${build_dir}/graphite-web-${::graphite::params::graphiteVersion}"
-
-  $carbon_dl_url = "https://github.com/graphite-project/carbon/archive/${::graphite::params::carbonVersion}.tar.gz"
-  $carbon_dl_loc = "${build_dir}/carbon-${::graphite::params::carbonVersion}"
+  # $carbon_dl_url = "https://github.com/graphite-project/carbon/archive/${carbonVersion}.tar.gz"
+  # $carbon_dl_loc = "${build_dir}/carbon-${carbonVersion}"
 
   $install_prefix = '/opt/'
   $enable_carbon_relay = false
@@ -57,10 +57,11 @@ class graphite::params {
       $python_dev_pkg = 'python-dev'
 
       # see https://github.com/graphite-project/carbon/issues/86
-      $carbin_pip_hack_source = "/usr/lib/python2.7/dist-packages/carbon-${carbonVersion}-py2.7.egg-info"
-      $carbin_pip_hack_target = "/opt/graphite/lib/carbon-${carbonVersion}-py2.7.egg-info"
-      $gweb_pip_hack_source = "/usr/lib/python2.7/dist-packages/graphite_web-${carbonVersion}-py2.7.egg-info"
-      $gweb_pip_hack_target = "/opt/graphite/webapp/graphite_web-${carbonVersion}-py2.7.egg-info"
+      $python_version = '2.7'
+      $python_packages_folder = 'dist-packages'
+      $python_pip_hack_source_path = "/usr/lib/python${python_version}/${python_packages_folder}"
+      $carbon_pip_hack_target_path = "/opt/graphite/lib"
+      $gweb_pip_hack_target_path = "/opt/graphite/webapp"
 
       $graphitepkgs = [
         'python-cairo',
@@ -103,19 +104,18 @@ class graphite::params {
       # see https://github.com/graphite-project/carbon/issues/86
       case $::operatingsystemrelease {
         /^6\.\d+$/: {
-          $carbin_pip_hack_source = "/usr/lib/python2.6/site-packages/carbon-${carbonVersion}-py2.6.egg-info"
-          $carbin_pip_hack_target = "/opt/graphite/lib/carbon-${carbonVersion}-py2.6.egg-info"
-          $gweb_pip_hack_source = "/usr/lib/python2.6/site-packages/graphite_web-${graphiteVersion}-py2.6.egg-info"
-          $gweb_pip_hack_target = "/opt/graphite/webapp/graphite_web-${graphiteVersion}-py2.6.egg-info"
+          $python_version = "2.6"
         }
         /^7\.\d+/: {
-          $carbin_pip_hack_source = "/usr/lib/python2.7/site-packages/carbon-${carbonVersion}-py2.7.egg-info"
-          $carbin_pip_hack_target = "/opt/graphite/lib/carbon-${carbonVersion}-py2.7.egg-info"
-          $gweb_pip_hack_source = "/usr/lib/python2.7/site-packages/graphite_web-${graphiteVersion}-py2.7.egg-info"
-          $gweb_pip_hack_target = "/opt/graphite/webapp/graphite_web-${graphiteVersion}-py2.7.egg-info"
+          $python_version = "2.7"
         }
         default: {fail('Unsupported Redhat release')}
       }
+
+      $python_packages_folder = 'site-packages'
+      $python_pip_hack_source_path = "/usr/lib/python${python_version}/${python_packages_folder}"
+      $carbon_pip_hack_target_path = "/opt/graphite/lib"
+      $gweb_pip_hack_target_path = "/opt/graphite/webapp"
 
       $graphitepkgs = [
         'pycairo',
@@ -144,4 +144,27 @@ class graphite::params {
     default  => fail('The only supported web servers are \'apache\', \'nginx\',  \'wsgionly\' and \'none\''),
   }
 
+  # configure carbon engines
+  if $::graphite::gr_enable_carbon_relay and $::graphite::gr_enable_carbon_aggregator {
+    $notify_services = [
+      Service['carbon-aggregator'],
+      Service['carbon-relay'],
+      Service['carbon-cache']
+    ]
+  }
+  elsif $::graphite::gr_enable_carbon_relay {
+    $notify_services = [
+      Service['carbon-relay'],
+      Service['carbon-cache']
+    ]
+  }
+  elsif $::graphite::gr_enable_carbon_aggregator {
+    $notify_services = [
+      Service['carbon-aggregator'],
+      Service['carbon-cache']
+    ]
+  }
+  else {
+    $notify_services = [ Service['carbon-cache'] ]
+  }
 }
