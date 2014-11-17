@@ -14,8 +14,9 @@ class graphite::install::graphite_web (
   validate_re($installation_type, '^(package|source)$', 'installation_type must be one of \'package\' or \'source\'')
   validate_re($version, '\d+\.\d+\.\d+(-)?\w+', 'graphite-web version format is incorrect')
 
-  $gweb_pip_hack_source = "${python_pip_hack_source_path}/graphite_web-${version}-py${python_version}.egg-info"
-  $gweb_pip_hack_target = "${gweb_pip_hack_target_path}/graphite_web-${version}-py${python_version}.egg-info"
+  $gweb_pip_hack_version = regsubst($version, '-', '_')
+  $gweb_pip_hack_source = "${python_pip_hack_source_path}/graphite_web-${gweb_pip_hack_version}-py${python_version}.egg-info"
+  $gweb_pip_hack_target = "${gweb_pip_hack_target_path}/graphite_web-${gweb_pip_hack_version}-py${python_version}.egg-info"
 
   case downcase($installation_type) {
     'package': {
@@ -61,8 +62,8 @@ class graphite::install::graphite_web (
   } ->
 
   exec { 'gweb_cleanup_pip_egg_info_files':
-    command => "find ${python_pip_hack_source_path} -name 'graphite_web-*.*.*-py${python_version}.egg-info' -not -name 'graphite_web-${version}-py${python_version}.egg-info' -exec rm {} \\;",
-    onlyif  => "find ${python_pip_hack_source_path} -name 'graphite_web-*.*.*-py${python_version}.egg-info' -not -name 'graphite_web-${version}-py${python_version}.egg-info' | egrep '.*'",
+    command => "find ${python_pip_hack_source_path} -name 'graphite_web-*.*.*-py${python_version}.egg-info' -not -name 'graphite_web-${gweb_pip_hack_version}-py${python_version}.egg-info' -exec rm {} \\;",
+    onlyif  => "find ${python_pip_hack_source_path} -name 'graphite_web-*.*.*-py${python_version}.egg-info' -not -name 'graphite_web-${gweb_pip_hack_version}-py${python_version}.egg-info' | egrep '.*'",
     path    => $::path,
   }
 }

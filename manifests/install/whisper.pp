@@ -14,6 +14,8 @@ class graphite::install::whisper (
   validate_re($installation_type, '^(package|source)$', 'installation_type must be one of \'package\' or \'source\'')
   validate_re($version, '\d+\.\d+\.\d+(-)?\w+', 'whisper version format is incorrect')
 
+  $whisper_pip_hack_version = regsubst($version, '-', '_')
+
   case downcase($installation_type) {
     'package': {
       package{ 'whisper':
@@ -50,8 +52,8 @@ class graphite::install::whisper (
   }
 
   exec { 'whisper_cleanup_pip_egg_info_files':
-    command     => "find /usr/local/lib/python${python_version}/${python_packages_folder} -name 'whisper-*.*.*-py${python_version}.egg-info' -not -name 'whisper-${version}-py${python_version}.egg-info' -exec rm {} \\;",
-    onlyif      => "find /usr/local/lib/python${python_version}/${python_packages_folder} -name 'whisper-*.*.*-py${python_version}.egg-info' -not -name 'whisper-${version}-py${python_version}.egg-info' | egrep '.*'",
+    command     => "find /usr/local/lib/python${python_version}/${python_packages_folder} -name 'whisper-*.*.*-py${python_version}.egg-info' -not -name 'whisper-${whisper_pip_hack_version}-py${python_version}.egg-info' -exec rm {} \\;",
+    onlyif      => "find /usr/local/lib/python${python_version}/${python_packages_folder} -name 'whisper-*.*.*-py${python_version}.egg-info' -not -name 'whisper-${whisper_pip_hack_version}-py${python_version}.egg-info' | egrep '.*'",
     path        => $::path,
   }
 }
