@@ -13,29 +13,47 @@ class graphite::config_gunicorn inherits graphite::params {
 
   if $::osfamily == 'debian' {
 
-    package {
-      'gunicorn':
-        ensure => installed,
-        before => Exec['Chown graphite for web user'],
-        notify => Exec['Chown graphite for web user'];
+    if ! defined(Package['gunicorn']) {
+      package {
+        'gunicorn':
+          ensure => installed,
+          before => Exec['Chown graphite for web user'],
+          notify => Exec['Chown graphite for web user'];
+      }
+    } else {
+      Package<| title == 'gunicorn' |> {
+        before +> Exec['Chown graphite for web user'],
+        notify +> Exec['Chown graphite for web user']
+      }
     }
-  
-    service {
-      'gunicorn':
-        ensure     => running,
-        enable     => true,
-        hasrestart => true,
-        hasstatus  => false,
-        subscribe  => File['/opt/graphite/webapp/graphite/local_settings.py'],
-        require    => [
+
+    if ! defined(Service['gunicorn']) {
+      service {
+        'gunicorn':
+          ensure     => running,
+          enable     => true,
+          hasrestart => true,
+          hasstatus  => false,
+          subscribe  => File['/opt/graphite/webapp/graphite/local_settings.py'],
+          require    => [
+            Package['gunicorn'],
+            Exec['Initial django db creation'],
+            Exec['Chown graphite for web user']
+          ];
+      }
+    } else {
+      Service<| title == 'gunicorn' |> {
+        subscribe +> File['/opt/graphite/webapp/graphite/local_settings.py'],
+        require   +> [
           Package['gunicorn'],
           Exec['Initial django db creation'],
           Exec['Chown graphite for web user']
-        ];
+        ]
+      }
     }
-  
+
     # Deploy configfiles
-  
+
     file {
       '/etc/gunicorn.d/graphite':
         ensure  => file,
