@@ -7,5 +7,6 @@ CONFIG = {
 	'--timeout=<%= scope.lookupvar('graphite::gunicorn_arg_timeout') %>',
         '--bind=unix:/var/run/graphite.sock',
 	'--workers=<%= scope.lookupvar('graphite::gunicorn_workers') %>',
+	'--max-requests=<%= scope.lookupvar('graphite::gunicorn_max_requests') %>',
     ),
 }

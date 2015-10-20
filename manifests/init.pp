@@ -305,6 +305,9 @@
 # [*gunicorn_workers*]
 #   value to pass to gunicorn's --worker arg.
 #   Default is 2
+# [*gunicorn_max_requests*]
+#   value to pass to gunicorn's --max-requests arg.
+#   Default is 0
 
 # === Examples
 #
@@ -456,6 +459,7 @@ class graphite (
   $gr_local_data_dir            = '/opt/graphite/storage/whisper',
   $gunicorn_arg_timeout         = 30,
   $gunicorn_workers             = 2,
+  $gunicorn_max_requests        = 0,
 ) {
   # Validation of input variables.
   # TODO - validate all the things
