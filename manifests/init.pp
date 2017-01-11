@@ -273,6 +273,12 @@
 # [*nginx_proxy_read_timeout*]
 #   Value to use for nginx's proxy_read_timeout setting
 #   Default is 10s
+# [*nginx_access_log*]
+#   Value to use for nginx's access log
+#   Default is /var/log/gunicorn/access.log
+# [*nginx_error_log*]
+#   Value to use for nginx's error log
+#   Default is /var/log/gunicorn/error.log
 # [*manage_ca_certificate*]
 #   Used to determine to install ca-certificate or not. default = true
 # [*gr_use_ldap*]
@@ -446,6 +452,8 @@ class graphite (
   $gr_cluster_cache_duration    = 300,
   $nginx_htpasswd               = undef,
   $nginx_proxy_read_timeout     = 10,
+  $nginx_access_log             = '/var/log/gunicorn/access.log',
+  $nginx_error_log              = '/var/log/gunicorn/error.log',
   $manage_ca_certificate        = true,
   $gr_use_ldap                  = false,
   $gr_ldap_uri                  = '',
