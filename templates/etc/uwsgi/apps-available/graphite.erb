@@ -11,8 +11,6 @@ socket = /tmp/uwsgi.sock
 stats = /tmp/uwsgi.stats
 pidfile2 = /tmp/uwsgi2.pid
 
-gid = <%= scope.lookupvar('graphite::gr_web_group') %>
-uid = <%= scope.lookupvar('graphite::gr_web_user') %>
 chdir = /opt/graphite/conf
 module = wsgi:application
 plugins = python
