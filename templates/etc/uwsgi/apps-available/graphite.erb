@@ -9,7 +9,7 @@ processes = <%= scope.lookupvar('graphite::uwsgi_num_processes') %>
 # the socket (use the full path to be safe)
 socket = /tmp/uwsgi.sock
 stats = /tmp/uwsgi.stats
-pidfile = /tmp/uwsgi.pid
+pidfile2 = /tmp/uwsgi2.pid
 
 gid = <%= scope.lookupvar('graphite::gr_web_group') %>
 uid = <%= scope.lookupvar('graphite::gr_web_user') %>
@@ -36,4 +36,4 @@ buffer-size = <%= scope.lookupvar('graphite::uwsgi_buffer_size') %>
 log-format = %(addr) - %(user) [%(ltime)] "%(method) %(uri) %(proto)" %(status) %(size) "%(referer)" "%(uagent)"
 
 logformat = [pid: %(pid)|app: ??|req: ??/??] %(addr) (%(user)) {%(vars) vars in %(pktsize) bytes} [%(ctime)] %(method) %(uri) => generated %(rsize) bytes in %(msecs) msecs (%(proto) %(status)) %(headers) headers in %(hsize) bytes (%(switches) switches on core %(core)) [ RSS bytes = %(rss) ]
-log-to = /var/log/uwsgi.log
+#log-to = /var/log/uwsgi.log

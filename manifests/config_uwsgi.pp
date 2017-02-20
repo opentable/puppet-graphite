@@ -24,20 +24,6 @@ class graphite::config_uwsgi inherits graphite::params {
         ensure => installed,
     }
 
-    service {
-      'uwsgi':
-        ensure     => running,
-        enable     => true,
-        hasrestart => true,
-        hasstatus  => false,
-        subscribe  => File['/opt/graphite/webapp/graphite/local_settings.py'],
-        require    => [
-          Package['uwsgi'],
-          Exec['Initial django db creation'],
-          Exec['Chown graphite for web user']
-        ];
-    }
-
     # Deploy configfiles
     file {
       '/etc/uwsgi':
@@ -59,13 +45,31 @@ class graphite::config_uwsgi inherits graphite::params {
         ensure  => file,
         mode    => '0755',
         require => Package['uwsgi'],
-        notify  => Service['uwsgi'];
-        content => template('graphite/etc/uwsgi/sites-enabled/graphite.ini'),
+        notify  => Service['uwsgi'],
+        content => template('graphite/etc/uwsgi/apps-available/graphite.erb'),
     } ->
     file {
       '/etc/uwsgi/apps-enabled/graphite.ini':
         ensure => 'link',
         target => '/etc/uwsgi/apps-available/graphite.ini'
+    } ->
+    file {
+      '/opt/graphite/conf/wsgi.py':
+        ensure => 'link',
+        target => '/opt/graphite/conf/graphite.wsgi'
+    } ->
+    service {
+      'uwsgi':
+        ensure     => running,
+        enable     => true,
+        hasrestart => true,
+        hasstatus  => false,
+        subscribe  => File['/opt/graphite/webapp/graphite/local_settings.py'],
+        require    => [
+          Package['uwsgi'],
+          Exec['Initial django db creation'],
+          Exec['Chown graphite for web user']
+        ];
     }
 
   } elsif $::osfamily == 'redhat' {

@@ -104,8 +104,9 @@
 #   (matches the exammple configuration from graphite 0.9.12)
 # [*gr_web_server*]
 #   The web server to use.
-#   Valid values are 'apache', 'nginx', 'wsgionly' and 'none'. 'nginx' is only
+#   Valid values are 'apache', 'nginx', 'nginx-uwsgi', 'wsgionly' and 'none'. 'nginx' is only
 #   supported on Debian-like systems.
+#   'nginx-uwsgi' will install nginx and uwsgi
 #   'wsgionly' will omit apache and nginx, allowing you to run your own
 #   webserver and communicate via wsgi to the unix socket. Handy for servers
 #   with multiple vhosts/purposes etc.
@@ -484,7 +485,7 @@ class graphite (
   $gunicorn_arg_timeout         = 30,
   $gunicorn_workers             = 2,
   $gunicorn_max_requests        = 0,
-  $uwsgi_max_reqeuests          = 8,
+  $uwsgi_num_processes          = 8,
   $uwsgi_reload_on_rss          = 400,
   $uwsgi_evil_reload_on_rss     = 1000,
   $uwsgi_buffer_size            = 32768,
