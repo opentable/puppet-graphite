@@ -27,18 +27,18 @@ class graphite::config_uwsgi inherits graphite::params {
     # Deploy configfiles
     file {
       '/etc/uwsgi':
-        ensure  => directory,
-        mode    => '0755',
+        ensure => directory,
+        mode   => '0755',
     } ->
     file {
       '/etc/uwsgi/apps-available':
-        ensure  => directory,
-        mode    => '0755',
+        ensure => directory,
+        mode   => '0755',
     } ->
     file {
       '/etc/uwsgi/apps-enabled':
-        ensure  => directory,
-        mode    => '0755',
+        ensure => directory,
+        mode   => '0755',
     } ->
     file {
       '/etc/uwsgi/apps-available/graphite.ini':
@@ -72,17 +72,8 @@ class graphite::config_uwsgi inherits graphite::params {
         ];
     }
 
-  } elsif $::osfamily == 'redhat' {
-
-    package {
-      'uwsgi':
-        ensure => installed,
-        before => Exec['Chown graphite for web user'],
-        notify => Exec['Chown graphite for web user'];
-    }
-
   } else {
-    fail("uwsgi-based graphite is not supported on ${::operatingsystem} (only supported on Debian & RedHat)")
+    fail("uwsgi-based graphite is not supported on ${::operatingsystem} (only supported on Debian)")
   }
 
 }
