@@ -1,0 +1,37 @@
+[uwsgi]
+# master
+master = true
+
+# maximum number of processes
+processes = <%= scope.lookupvar('graphite::uwsgi_num_processes') %>
+#threads = 2
+
+# the socket (use the full path to be safe)
+socket = /tmp/uwsgi.sock
+stats = /tmp/uwsgi.stats
+pidfile2 = /tmp/uwsgi2.pid
+
+chdir = /opt/graphite/conf
+module = wsgi:application
+plugins = python
+
+# Restart after n number of requests
+max-requests = <%= scope.lookupvar('graphite::uwsgi_max_requests') %>
+
+
+# reload if rss memory is higher than specified megabytes
+reload-on-rss = <%= scope.lookupvar('graphite::uwsgi_reload_on_rss') %>
+ 
+# force the master to reload a worker if its rss memory is higher than specified megabytes
+evil-reload-on-rss = <%= scope.lookupvar('graphite::uwsgi_evil_reload_on_rss') %>
+
+
+pythonpath = /opt/graphite/webapp
+pymodule-alias = graphite.local_settings=/opt/graphite/webapp/graphite/local_settings.py
+buffer-size = <%= scope.lookupvar('graphite::uwsgi_buffer_size') %>
+
+# configure logging
+log-format = %(addr) - %(user) [%(ltime)] "%(method) %(uri) %(proto)" %(status) %(size) "%(referer)" "%(uagent)"
+
+logformat = [pid: %(pid)|app: ??|req: ??/??] %(addr) (%(user)) {%(vars) vars in %(pktsize) bytes} [%(ctime)] %(method) %(uri) => generated %(rsize) bytes in %(msecs) msecs (%(proto) %(status)) %(headers) headers in %(hsize) bytes (%(switches) switches on core %(core)) [ RSS bytes = %(rss) ]
+#log-to = /var/log/uwsgi.log

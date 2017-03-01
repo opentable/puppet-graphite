@@ -104,8 +104,9 @@
 #   (matches the exammple configuration from graphite 0.9.12)
 # [*gr_web_server*]
 #   The web server to use.
-#   Valid values are 'apache', 'nginx', 'wsgionly' and 'none'. 'nginx' is only
+#   Valid values are 'apache', 'nginx', 'nginx-uwsgi', 'wsgionly' and 'none'. 'nginx' is only
 #   supported on Debian-like systems.
+#   'nginx-uwsgi' will install nginx and uwsgi
 #   'wsgionly' will omit apache and nginx, allowing you to run your own
 #   webserver and communicate via wsgi to the unix socket. Handy for servers
 #   with multiple vhosts/purposes etc.
@@ -314,6 +315,22 @@
 # [*gunicorn_max_requests*]
 #   value to pass to gunicorn's --max-requests arg.
 #   Default is 0
+# [*uwsgi_num_processes*]
+#   number of uwsgi processes to run.
+#   Default is 4
+# [*uwsgi_max_requests*]
+#   value to pass to uwsgi --max-requests arg.
+#   Default is 1000
+# [*uwsgi_reload_on_rss*]
+#   value to pass to uwsgi --reload-on-rss arg.
+#   Default is 400
+# [*uwsgi_evil_reload_on_rss*]
+#   value to pass to uwsgi --evil-reload-on-rss arg.
+#   kills process without waiting for it to end gracefully
+#   Default is 1000
+# [*uwsgi_buffer_size*]
+#   value to pass to uwsgi --buffer-size.
+#   Default is 32768
 
 # === Examples
 #
@@ -468,6 +485,10 @@ class graphite (
   $gunicorn_arg_timeout         = 30,
   $gunicorn_workers             = 2,
   $gunicorn_max_requests        = 0,
+  $uwsgi_num_processes          = 8,
+  $uwsgi_reload_on_rss          = 400,
+  $uwsgi_evil_reload_on_rss     = 1000,
+  $uwsgi_buffer_size            = 32768,
 ) {
   # Validation of input variables.
   # TODO - validate all the things
