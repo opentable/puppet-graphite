@@ -29,7 +29,7 @@ class graphite::config inherits graphite::params {
       include graphite::config_nginx
       $web_server_package_require = [Package["${::graphite::params::web_server_pkg}"]]
     }
-    'nginx-uwsgi': {
+    'nginx_uwsgi': {
       # Configure uwsgi and nginx.
       include graphite::config_uwsgi
       include graphite::config_nginx
