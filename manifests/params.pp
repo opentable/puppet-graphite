@@ -139,10 +139,10 @@ class graphite::params {
   $web_server_pkg = $graphite::gr_web_server ? {
     apache      => $apache_pkg,
     nginx       => 'nginx',
-    nginx-uwsgi => 'nginx',
+    nginx_uwsgi => 'nginx',
     wsgionly    => 'dont-install-webserver-package',
     none        => 'dont-install-webserver-package',
-    default     => fail('The only supported web servers are \'apache\', \'nginx-uwsgi\', \'nginx\',  \'wsgionly\' and \'none\''),
+    default     => fail('The only supported web servers are \'apache\', \'nginx_uwsgi\', \'nginx\',  \'wsgionly\' and \'none\''),
   }
 
   # configure carbon engines
