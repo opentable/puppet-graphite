@@ -12,7 +12,7 @@ class graphite::install::graphite_web (
   $source            = $graphite::install::gw_source,
 ) inherits graphite::params {
   validate_re($installation_type, '^(package|source)$', 'installation_type must be one of \'package\' or \'source\'')
-  validate_re($version, '\d+\.\d+\.\d+(-)?\w+', 'graphite-web version format is incorrect')
+  validate_re($version, '\d+\.\d+\.\d+(-)?\w*', 'graphite-web version format is incorrect')
 
   $gweb_pip_hack_version = regsubst($version, '-', '_')
   $gweb_pip_hack_source = "${python_pip_hack_source_path}/graphite_web-${gweb_pip_hack_version}-py${python_version}.egg-info"

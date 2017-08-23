@@ -12,7 +12,7 @@ class graphite::install::whisper (
   $source            = $graphite::install::whisper_source,
 ) inherits graphite::params {
   validate_re($installation_type, '^(package|source)$', 'installation_type must be one of \'package\' or \'source\'')
-  validate_re($version, '\d+\.\d+\.\d+(-)?\w+', 'whisper version format is incorrect')
+  validate_re($version, '\d+\.\d+\.\d+(-)?\w*', 'whisper version format is incorrect')
 
   $whisper_pip_hack_version = regsubst($version, '-', '_')
 
