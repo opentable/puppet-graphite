@@ -33,7 +33,7 @@ class graphite::install::graphite_web (
         ensure => directory,
         mode   => '0755',
       })
-      
+
       ensure_resource('package', 'git', { ensure => installed })
 
       vcsrepo { '/var/git/graphite-web':
@@ -53,8 +53,9 @@ class graphite::install::graphite_web (
         refreshonly => true,
         notify      => $notify_services,
       }
+
     }
-  }
+  } ->
 
   file { $gweb_pip_hack_source :
     ensure => link,
@@ -65,5 +66,25 @@ class graphite::install::graphite_web (
     command => "find ${python_pip_hack_source_path} -name 'graphite_web-*.*.*-py${python_version}.egg-info' -not -name 'graphite_web-${gweb_pip_hack_version}-py${python_version}.egg-info' -exec rm {} \\;",
     onlyif  => "find ${python_pip_hack_source_path} -name 'graphite_web-*.*.*-py${python_version}.egg-info' -not -name 'graphite_web-${gweb_pip_hack_version}-py${python_version}.egg-info' | egrep '.*'",
     path    => $::path,
+  } ->
+
+  file { '/opt/graphite/webapp/graphite/manage.py':
+    ensure => present,
+    source => '/var/git/graphite-web/webapp/manage.py',
+    require      => File[$gweb_pip_hack_source],
+  } ->
+
+  file { '/opt/graphite/static':
+    ensure  => directory,
+  } ->
+
+  exec { 'build_static_assets':
+    command     => 'django-admin collectstatic --noinput --settings=graphite.settings',
+    cwd         => '/opt/graphite',
+    environment => [ "PYTHONPATH=$PYTHONPATH:/opt/graphite/webapp" ],
+    path        => $::path,
+    subscribe   => File['/opt/graphite/static'],
+    refreshonly => true,
+    notify      => $notify_services,
   }
 }
