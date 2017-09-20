@@ -93,6 +93,6 @@ class graphite::install::graphite_web (
     path        => $::path,
     subscribe   => File['/opt/graphite/static'],
     refreshonly => true,
-    notify      => ::Graphite::Service['uwsgi'],
+    notify      => Service['uwsgi'],
   }
 }
