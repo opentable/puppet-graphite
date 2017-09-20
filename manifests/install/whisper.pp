@@ -26,14 +26,22 @@ class graphite::install::whisper (
       }
     }
     'source': {
+      ensure_resource('package', 'git', { ensure => installed })
+
       ensure_resource(file, '/var/git', {
         ensure => directory,
         mode   => '0755',
       })
-      
-      ensure_resource('package', 'git', { ensure => installed })
 
-      vcsrepo { '/var/git/whisper':
+      exec { "clean old whisper repo":
+        command => '/bin/rm -rf ./whisper',
+        cwd     => '/var/git/',
+        path    => $::path,
+        onlyif  => "test -d /var/git/whisper",
+        unless  => "/usr/bin/pip list | grep whisper | grep ${version}",
+      } ->
+
+      vcsrepo { "/var/git/whisper":
         ensure   => present,
         provider => git,
         source   => $source,
@@ -44,7 +52,7 @@ class graphite::install::whisper (
 
       exec { 'build_whisper':
         command     => 'python setup.py build && python setup.py install',
-        cwd         => '/var/git/whisper',
+        cwd         => "/var/git/whisper",
         path        => $::path,
         refreshonly => true,
       }
@@ -52,8 +60,8 @@ class graphite::install::whisper (
   }
 
   exec { 'whisper_cleanup_pip_egg_info_files':
-    command     => "find /usr/local/lib/python${python_version}/${python_packages_folder} -name 'whisper-*.*.*-py${python_version}.egg-info' -not -name 'whisper-${whisper_pip_hack_version}-py${python_version}.egg-info' -exec rm {} \\;",
-    onlyif      => "find /usr/local/lib/python${python_version}/${python_packages_folder} -name 'whisper-*.*.*-py${python_version}.egg-info' -not -name 'whisper-${whisper_pip_hack_version}-py${python_version}.egg-info' | egrep '.*'",
+    command     => "find /usr/local/lib/python${python_version}/${python_packages_folder} -name 'whisper-*.*.*.egg-info' -not -name 'whisper-${whisper_pip_hack_version}*.egg-info' -exec rm {} \\;",
+    onlyif      => "find /usr/local/lib/python${python_version}/${python_packages_folder} -name 'whisper-*.*.*.egg-info' -not -name 'whisper-${whisper_pip_hack_version}*.egg-info' | egrep '.*'",
     path        => $::path,
   }
 }

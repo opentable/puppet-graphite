@@ -29,14 +29,22 @@ class graphite::install::graphite_web (
       }
     }
     'source': {
+      ensure_resource('package', 'git', { ensure => installed })
+
       ensure_resource(file, '/var/git', {
         ensure => directory,
         mode   => '0755',
       })
 
-      ensure_resource('package', 'git', { ensure => installed })
+      exec { "clean graphite-web repo":
+        command     => '/bin/rm -rf ./graphite-web',
+        cwd         => '/var/git/',
+        path        => $::path,
+        onlyif => "test -d /var/git/graphite-web",
+        unless  => "/usr/bin/pip list | grep graphite-web | grep ${version}",
+      } ->
 
-      vcsrepo { '/var/git/graphite-web':
+      vcsrepo { "/var/git/graphite-web":
         ensure   => present,
         provider => git,
         source   => $source,
@@ -48,7 +56,7 @@ class graphite::install::graphite_web (
 
       exec { 'build_graphite-web':
         command     => 'python setup.py build && python setup.py install',
-        cwd         => '/var/git/graphite-web',
+        cwd         => "/var/git/graphite-web",
         path        => $::path,
         refreshonly => true,
         notify      => $notify_services,
@@ -70,7 +78,7 @@ class graphite::install::graphite_web (
 
   file { '/opt/graphite/webapp/graphite/manage.py':
     ensure => present,
-    source => '/var/git/graphite-web/webapp/manage.py',
+    source => "/var/git/graphite-web/webapp/manage.py",
     require      => File[$gweb_pip_hack_source],
   } ->
 
@@ -85,6 +93,6 @@ class graphite::install::graphite_web (
     path        => $::path,
     subscribe   => File['/opt/graphite/static'],
     refreshonly => true,
-    notify      => $notify_services,
+    notify      => ::Graphite::Service['uwsgi'],
   }
 }
