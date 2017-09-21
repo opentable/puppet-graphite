@@ -7,17 +7,17 @@
 # None.
 #
 class graphite::install (
-  $django_tagging_ver        = '0.3.1',
-  $twisted_ver               = '11.1.0',
+  $django_tagging_ver        = '0.4.5',
+  $twisted_ver               = '13.2.0',
   $txamqp_ver                = '0.4',
   $gw_installation_type      = 'package',
-  $gw_ver                    = '0.9.12',
+  $gw_ver                    = '1.0.2',
   $gw_source                 = undef,
   $carbon_installation_type  = 'package',
-  $carbon_ver                = '0.9.12',
+  $carbon_ver                = '1.0.2',
   $carbon_source             = undef,
   $whisper_installation_type = 'package',
-  $whisper_ver               = '0.9.12',
+  $whisper_ver               = '1.0.2',
   $whisper_source            = undef,
 ) inherits graphite::params {
 

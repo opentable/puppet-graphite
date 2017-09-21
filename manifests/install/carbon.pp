@@ -29,14 +29,23 @@ class graphite::install::carbon (
       }
     }
     'source': {
+
+      ensure_resource('package', 'git', { ensure => installed })
+
       ensure_resource(file, '/var/git', {
         ensure => directory,
         mode   => '0755',
       })
-      
-      ensure_resource('package', 'git', { ensure => installed })
 
-      vcsrepo { '/var/git/carbon':
+      exec { "clean carbon repo":
+        command     => '/bin/rm -rf ./carbon',
+        cwd         => '/var/git/',
+        path        => $::path,
+        onlyif => "test -d /var/git/carbon",
+        unless  => "/usr/bin/pip list | grep carbon | grep ${version}",
+      } ->
+
+      vcsrepo { "/var/git/carbon":
         ensure   => present,
         provider => git,
         source   => $source,
@@ -48,7 +57,7 @@ class graphite::install::carbon (
 
       exec { 'build_carbon':
         command     => 'python setup.py build && python setup.py install',
-        cwd         => '/var/git/carbon',
+        cwd         => "/var/git/carbon",
         path        => $::path,
         refreshonly => true,
         notify      => $notify_services,
