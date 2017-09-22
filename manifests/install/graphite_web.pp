@@ -89,7 +89,7 @@ class graphite::install::graphite_web (
   exec { 'build_static_assets':
     command     => 'django-admin collectstatic --noinput --settings=graphite.settings',
     cwd         => '/opt/graphite',
-    environment => [ "PYTHONPATH=$PYTHONPATH:/opt/graphite/webapp" ],
+    environment => [ 'PYTHONPATH=$PYTHONPATH:/opt/graphite/webapp' ],
     path        => $::path,
     subscribe   => File['/opt/graphite/static'],
     refreshonly => true,
