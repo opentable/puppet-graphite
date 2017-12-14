@@ -306,6 +306,8 @@
 #   variable (mainly for nginx use) to tell Graphite a user is authenticated.
 #   Useful when using an external auth handler with X-Accel-Redirect etc.
 #   Example value - HTTP_X_REMOTE_USER
+# [*gr_interpreter*]
+#   Specify interpreter for carbon-cache, ex: pypy
 # [*gunicorn_arg_timeout*]
 #   value to pass to gunicorn's --timeout arg.
 #   Default is 30
@@ -482,6 +484,7 @@ class graphite (
   $gr_use_remote_user_auth      = 'False',
   $gr_remote_user_header_name   = undef,
   $gr_local_data_dir            = '/opt/graphite/storage/whisper',
+  $gr_interpreter               = 'python',
   $gunicorn_arg_timeout         = 30,
   $gunicorn_workers             = 2,
   $gunicorn_max_requests        = 0,
