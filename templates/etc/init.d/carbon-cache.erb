@@ -11,9 +11,7 @@
 # Short-Description: Start/Stop carbon-cache
 # Description: Enables Graphites carbon-cache data collecting engine
 ### END INIT INFO
-<% if scope['graphite::gr_interpreter'] != 'python' -%>
-export PYTHONPATH="/usr/local/lib/python2.7/dist-packages:/usr/lib/python2.7/dist-packages"
-<% end -%>
+export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}<%= scope['graphite::gr_pythonpath'] %>"
 
 case "$1" in
 	start)

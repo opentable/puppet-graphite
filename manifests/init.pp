@@ -485,6 +485,7 @@ class graphite (
   $gr_remote_user_header_name   = undef,
   $gr_local_data_dir            = '/opt/graphite/storage/whisper',
   $gr_interpreter               = 'python',
+  $gr_pythonpath                = '',
   $gunicorn_arg_timeout         = 30,
   $gunicorn_workers             = 2,
   $gunicorn_max_requests        = 0,
