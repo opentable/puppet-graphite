@@ -308,6 +308,9 @@
 #   Example value - HTTP_X_REMOTE_USER
 # [*gr_interpreter*]
 #   Specify interpreter for carbon-cache, ex: pypy
+# [*gr_pythonpath*]
+#   Paths appended to PYTHONPATH env var for specifying python libraries.
+#   Useful for specifying libraries when running an alternate interpreter such as pypy.
 # [*gunicorn_arg_timeout*]
 #   value to pass to gunicorn's --timeout arg.
 #   Default is 30
