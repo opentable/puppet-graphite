@@ -11,16 +11,17 @@
 # Short-Description: Start/Stop carbon-cache
 # Description: Enables Graphites carbon-cache data collecting engine
 ### END INIT INFO
+export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}<%= scope['graphite::gr_pythonpath'] %>"
 
 case "$1" in
 	start)
-		python /opt/graphite/bin/carbon-cache.py start
+		<%= scope['graphite::gr_interpreter'] %> /opt/graphite/bin/carbon-cache.py start
 		;;
 	stop)
-		python /opt/graphite/bin/carbon-cache.py stop
+		<%= scope['graphite::gr_interpreter'] %> /opt/graphite/bin/carbon-cache.py stop
 		;;
 	status)
-		python /opt/graphite/bin/carbon-cache.py status
+		<%= scope['graphite::gr_interpreter'] %> /opt/graphite/bin/carbon-cache.py status
 		;;
 	restart)
 		$0 stop ; sleep 3 ; $0 start
