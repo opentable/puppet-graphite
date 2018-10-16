@@ -336,6 +336,9 @@
 # [*uwsgi_buffer_size*]
 #   value to pass to uwsgi --buffer-size.
 #   Default is 32768
+# [*restart_on_conf_change*]
+#   specify if puppet should restart graphite services on configuration changes
+#   Default is false
 
 # === Examples
 #
@@ -496,6 +499,7 @@ class graphite (
   $uwsgi_reload_on_rss          = 400,
   $uwsgi_evil_reload_on_rss     = 1000,
   $uwsgi_buffer_size            = 32768,
+  $restart_on_conf_change       = false,
 ) {
   # Validation of input variables.
   # TODO - validate all the things
