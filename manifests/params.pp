@@ -169,5 +169,7 @@ class graphite::params {
     else {
       $notify_services = [ Service['carbon-cache'] ]
     }
+  } else {
+    $notify_services = undef
   }
 }
