@@ -121,31 +121,6 @@ class graphite::config inherits graphite::params {
     }
   }
 
-  # configure carbon engines
-  if $::graphite::gr_enable_carbon_cache {
-      $service_cache = Service['carbon-cache']
-  } else {
-      $service_cache = undef
-  }
-
-  if $::graphite::gr_enable_carbon_relay {
-      $service_relay = Service['carbon-relay']
-  } else {
-      $service_relay = undef
-  }
-
-  if $::graphite::gr_enable_carbon_aggregator {
-      $service_aggregator = Service['carbon-aggregator']
-  } else {
-      $service_aggregator = undef
-  }
-
-  $notify_services = delete_undef_values([
-      $service_cache,
-      $service_relay,
-      $service_aggregator
-  ])
-
   if $::graphite::gr_enable_carbon_relay {
 
     file {
