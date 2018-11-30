@@ -147,28 +147,30 @@ class graphite::params {
 
   # configure carbon engines
   if $::graphite::restart_on_conf_change { 
-    if $::graphite::gr_enable_carbon_relay and $::graphite::gr_enable_carbon_aggregator {
-      $notify_services = [
-        Service['carbon-aggregator'],
-        Service['carbon-relay'],
-        Service['carbon-cache']
-      ]
+    if $::graphite::gr_enable_carbon_cache {
+      $service_cache = Service['carbon-cache']
+    } else {
+      $service_cache = undef
     }
-    elsif $::graphite::gr_enable_carbon_relay {
-      $notify_services = [
-        Service['carbon-relay'],
-        Service['carbon-cache']
-      ]
+
+    if $::graphite::gr_enable_carbon_relay {
+      $service_relay = Service['carbon-relay']
+    } else {
+      $service_relay = undef
     }
-    elsif $::graphite::gr_enable_carbon_aggregator {
-      $notify_services = [
-        Service['carbon-aggregator'],
-        Service['carbon-cache']
-      ]
+
+    if $::graphite::gr_enable_carbon_aggregator {
+      $service_aggregator = Service['carbon-aggregator']
+    } else {
+      $service_aggregator = undef
     }
-    else {
-      $notify_services = [ Service['carbon-cache'] ]
-    }
+
+    $notify_services = delete_undef_values([
+      $service_cache,
+      $service_relay,
+      $service_aggregator
+    ])
+
   } else {
     $notify_services = undef
   }

@@ -180,19 +180,21 @@ class graphite::config inherits graphite::params {
 
   # startup carbon engine
 
-  service { 'carbon-cache':
-    ensure     => running,
-    enable     => true,
-    hasstatus  => true,
-    hasrestart => true,
-    require    => File['/etc/init.d/carbon-cache'];
-  }
+  if $graphite::gr_enable_carbon_cache {
+    service { 'carbon-cache':
+      ensure     => running,
+      enable     => true,
+      hasrestart => true,
+      hasstatus  => true,
+      require    => File['/etc/init.d/carbon-cache'],
+    }
 
-  file { '/etc/init.d/carbon-cache':
-    ensure  => file,
-    mode    => '0750',
-    content => template('graphite/etc/init.d/carbon-cache.erb'),
-    require => File['/opt/graphite/conf/carbon.conf'];
+    file { '/etc/init.d/carbon-cache':
+      ensure  => file,
+      mode    => '0750',
+      content => template('graphite/etc/init.d/carbon-cache.erb'),
+      require => File['/opt/graphite/conf/carbon.conf'];
+    }
   }
 
   if $graphite::gr_enable_carbon_relay {
