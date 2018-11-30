@@ -1,16 +1,17 @@
 # Serve static files directly and redirect remaining requests to graphite
+
+log_format timing '$remote_addr - $remote_user [$time_local] '
+                  '"$request" $status $body_bytes_sent '
+                  '"$http_referer" "$http_user_agent" '
+                  '$http_x_forwarded_for $request_time '
+                  '$upstream_response_time $pipe';
+
 server {
   listen   <%= scope.lookupvar('graphite::gr_apache_port') %>;
   server_name <%= scope.lookupvar('graphite::gr_web_servername') %>;
 
   client_max_body_size 64M;
   keepalive_timeout 5;
-
-  log_format timing '$remote_addr - $remote_user [$time_local] '
-                    '"$request" $status $body_bytes_sent '
-                    '"$http_referer" "$http_user_agent" '
-                    '$http_x_forwarded_for $request_time '
-                    '$upstream_response_time $pipe';
 
   access_log <%= scope.lookupvar('graphite::nginx_access_log') %> timing;
   error_log  <%= scope.lookupvar('graphite::nginx_error_log') %>;
