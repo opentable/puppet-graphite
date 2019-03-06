@@ -36,27 +36,29 @@ class graphite::install (
 
   # using the pip package provider requires python-pip
 
-  if ! defined(Package[$::graphite::params::python_pip_pkg]) {
-    package { $::graphite::params::python_pip_pkg :
-      provider => undef, # default to package provider auto-discovery
-      before   => [
-        Package['django-tagging'],
-        Package['twisted'],
-        Package['txamqp'],
-      ]
+  if $::graphite::gr_manage_python_packages {
+    if ! defined(Package[$::graphite::params::python_pip_pkg]) {
+      package { $::graphite::params::python_pip_pkg :
+        provider => undef, # default to package provider auto-discovery
+        before   => [
+          Package['django-tagging'],
+          Package['twisted'],
+          Package['txamqp'],
+        ],
+      }
     }
-  }
 
-  # install python headers and libs for pip
+    # install python headers and libs for pip
 
-  if ! defined(Package[$::graphite::params::python_dev_pkg]) {
-    package { $::graphite::params::python_dev_pkg :
-      provider => undef, # default to package provider auto-discovery
-      before   => [
-        Package['django-tagging'],
-        Package['twisted'],
-        Package['txamqp'],
-      ]
+    if ! defined(Package[$::graphite::params::python_dev_pkg]) {
+      package { $::graphite::params::python_dev_pkg :
+        provider => undef, # default to package provider auto-discovery
+        before   => [
+          Package['django-tagging'],
+          Package['twisted'],
+          Package['txamqp'],
+        ],
+      }
     }
   }
 

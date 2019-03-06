@@ -342,6 +342,9 @@
 # [*restart_on_conf_change*]
 #   specify if puppet should restart graphite services on configuration changes
 #   Default is false
+# [*gr_manage_python_packages*]
+#   Boolean. Should the pip and python dev packages be managed by this module.
+#   Default: true
 
 # === Examples
 #
@@ -504,6 +507,7 @@ class graphite (
   $uwsgi_evil_reload_on_rss     = 1000,
   $uwsgi_buffer_size            = 32768,
   $restart_on_conf_change       = false,
+  $gr_manage_python_packages    = true,
 ) {
   # Validation of input variables.
   # TODO - validate all the things
